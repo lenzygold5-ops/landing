@@ -1,24 +1,27 @@
-# Frontend Mentor - Browser extensions manager UI
+# Frontend Mentor - Browser extensions manager UI solution
 
-![Design preview for the Browser extensions manager UI coding challenge](./preview.jpg)
+This is a solution to the [Browser extensions manager UI challenge on Frontend Mentor](https://www.frontendmentor.io/challenges/browser-extension-manager-ui-yNZnOfsMAp). Frontend Mentor challenges help you improve your coding skills by building realistic projects.
 
-## Welcome! 👋
+## Table of contents
 
-Thanks for checking out this front-end coding challenge.
+- [Overview](#overview)
+  - [The challenge](#the-challenge)
+  - [Screenshot](#screenshot)
+  - [Links](#links)
+- [My process](#my-process)
+  - [Built with](#built-with)
+  - [What I learned](#what-i-learned)
+  - [Continued development](#continued-development)
+  - [Useful resources](#useful-resources)
+  - [AI Collaboration](#ai-collaboration)
+- [Author](#author)
+- [Acknowledgments](#acknowledgments)
 
-[Frontend Mentor](https://www.frontendmentor.io) challenges help you improve your coding skills by building realistic projects.
+## Overview
 
-**To do this challenge, you need a basic understanding of HTML, CSS and JavaScript.**
+### The challenge
 
-## The challenge
-
-Your challenge is to build out this browser extension manager UI and get it looking as close to the design as possible.
-
-You can use any tools you like to help you complete the challenge. So if you've got something you'd like to practice, feel free to give it a go.
-
-We provide the data for the extensions in a local `data.json` file. So you can use that to add the data dynamically if you choose.
-
-Your users should be able to: 
+Users should be able to:
 
 - Toggle extensions between active and inactive states
 - Filter active and inactive extensions
@@ -27,87 +30,115 @@ Your users should be able to:
 - View the optimal layout for the interface depending on their device's screen size
 - See hover and focus states for all interactive elements on the page
 
-### Want some support on the challenge? 
+### Screenshot
 
-[Join our community](https://www.frontendmentor.io/community) and ask questions in the **#help** channel.
+![Preview of the extensions manager in both light and dark themes](./preview.jpg)
 
-## Where to find everything
+### Links
 
-Your task is to build out the project to the designs inside the `/design` folder. You will find both a mobile and a desktop version of the design. 
+- Solution URL: [https://lenzygold5-ops.github.io/landing/](https://lenzygold5-ops.github.io/landing/)
+- Live Site URL: [https://lenzygold5-ops.github.io/landing/](https://lenzygold5-ops.github.io/landing/)
+- Repository: [https://github.com/lenzygold5-ops/landing](https://github.com/lenzygold5-ops/landing)
 
-The designs are in JPG static format. Using JPGs will mean that you'll need to use your best judgment for styles such as `font-size`, `padding` and `margin`. 
+## My process
 
-If you would like the Figma design file to gain experience using professional tools and build more accurate projects faster, you can [subscribe as a PRO member](https://www.frontendmentor.io/pro).
+### Built with
 
-All the required assets for this project are in the `/assets` folder. The images are already exported for the correct screen size and optimized.
+- Semantic HTML5 markup
+- CSS custom properties for theming
+- CSS Grid (both for the card layout and for the extension grid)
+- Flexbox for the header, card footer, and filter row
+- Mobile-first workflow
+- Vanilla JavaScript (no framework)
+- `fetch` and the `&lt;template&gt;` element for rendering the extension list
+- GitHub Pages for deployment
 
-We also include variable and static font files for the required fonts for this project. You can choose to either link to Google Fonts or use the local font files to host the fonts yourself. Note that we've removed the static font files for the font weights that aren't needed for this project.
+### What I learned
 
-There is also a `style-guide.md` file containing the information you'll need, such as color palette and fonts.
+**Theming with CSS custom properties instead of class toggles.** The part I'm most happy with is how little the dark theme touches. Rather than adding a `.dark` class to components and overriding their colors one by one, I defined semantic tokens once and then re-pointed them:
 
-## Using AI coding assistants
+```css
+:root {
+  --surface: hsl(0, 0%, 100%);
+  --text-strong: var(--neutral-900);
+  --accent: var(--red-500);
+}
 
-We've included two files to help you if you're using AI coding assistants (like Claude, GitHub Copilot, Cursor, etc.) while working on this challenge:
+[data-theme='dark'] {
+  --surface: var(--neutral-800);
+  --text-strong: hsl(0, 0%, 100%);
+  --accent: var(--red-400);
+}
+```
 
-- `AGENTS.md` - Contains detailed instructions for AI assistants on how to help you with this challenge. It's tailored to this challenge's difficulty level, so the AI will provide guidance appropriate to your learning stage—offering more support for beginner challenges and encouraging more independence on advanced ones.
-- `CLAUDE.md` - A pointer file that directs Claude-based tools to the AGENTS.md instructions.
+Because every component references `var(--surface)` rather than a literal color, the entire dark theme is that one block. Adding a third theme would mean adding a third block and nothing else. This is the idea I want to carry into every future project.
 
-**How to use them:** You don't need to do anything! These files are automatically detected by most AI coding tools. The AI will read them and adjust its behavior to be a better learning partner—guiding you toward solutions rather than just giving you the answers.
+**Using `grid-template-areas` to change layout without changing markup.** The design indents the extension description under the title on desktop, but runs it full-width under the logo on mobile. Rather than duplicating markup or nudging things with margins, I let the same three elements (logo, name, description) be direct siblings in a grid and swapped which cells they occupy:
 
-**Note:** These files are designed to help you *learn*, not to do the work for you. The AI is instructed to ask questions, give hints, and explain concepts rather than writing complete solutions.
+```css
+/* Mobile: description spans the full card width */
+.card__body {
+  grid-template-areas:
+    'logo name'
+    'desc desc';
+}
 
-## Building your project
+/* Desktop: description sits in the second column, logo spans both rows */
+.card__body {
+  grid-template-areas:
+    'logo name'
+    'logo desc';
+}
+```
 
-Feel free to use any workflow that you feel comfortable with. Below is a suggested process, but do not feel like you need to follow these steps:
+**Event delegation for a list that re-renders.** Because every filter change or toggle rebuilds the cards, attaching a listener to each button would mean constantly discarding and re-binding them. One listener on the grid container handles all of them:
 
-1. Initialize your project as a public repository on [GitHub](https://github.com/). Creating a repo will make it easier to share your code with the community if you need help. If you're not sure how to do this, [have a read-through of this Try Git resource](https://try.github.io/).
-2. Configure your repository to publish your code to a web address. This will also be useful if you need some help during a challenge as you can share the URL for your project with your repo URL. There are a number of ways to do this, and we provide some recommendations below.
-3. Look through the designs to start planning out how you'll tackle the project. This step is crucial to help you think ahead for CSS classes to create reusable styles.
-4. Before adding any styles, structure your content with HTML. Writing your HTML first can help focus your attention on creating well-structured content.
-5. Write out the base styles for your project, including general content styles, such as `font-family` and `font-size`.
-6. Start adding styles to the top of the page and work down. Only move on to the next section once you're happy you've completed the area you're working on.
+```js
+grid.addEventListener('click', (event) => {
+  const button = event.target.closest('button');
+  if (!button) return;
 
-## Deploying your project
+  const { index } = button.closest('.card').dataset;
 
-As mentioned above, there are many ways to host your project for free. Our recommended hosts are:
+  if (button.classList.contains('btn--remove')) removeExtension(Number(index));
+  if (button.classList.contains('switch')) toggleExtension(Number(index));
+});
+```
 
-- [GitHub Pages](https://pages.github.com/)
-- [Vercel](https://vercel.com/)
-- [Netlify](https://www.netlify.com/)
+**A native `button` with `role="switch"` beats a styled checkbox.** I used `<button role="switch" aria-checked="true">` for the on/off toggles. A real checkbox can be restyled, but `appearance: none` strips its native look while leaving an awkward state model behind. This approach gets keyboard behaviour for free from the `button` element and still announces as an on/off switch rather than "checked" to screen readers.
 
-You can host your site using one of these solutions or any of our other trusted providers. [Read more about our recommended and trusted hosts](https://www.frontendmentor.io/guides/hosting-your-solution).
+**`fetch` and the CORS trap.** The page worked perfectly in the editor and showed nothing but an error when opened directly as a file. `fetch` is blocked by CORS on `file://` URLs, so serving the folder over HTTP (`npx serve .`) was required. Worth remembering for any future project that loads data.
 
-## Create a custom `README.md`
+### Continued development
 
-We strongly recommend overwriting this `README.md` with a custom one. We've provided a template inside the [`README-template.md`](./README-template.md) file in this starter code.
+- Replace the in-memory array with `localStorage` so extension state survives a page refresh
+- Add a confirmation step before removing an extension
+- Give the filter buttons a proper roving `tabindex` if I want them to behave exactly like a tablist
+- Improve the empty state so removing every extension in a filter shows something more useful than a generic message
+- Test the full range of screen sizes from 320px upward against WCAG requirements
 
-The template provides a guide for what to add. A custom `README` will help you explain your project and reflect on your learnings. Please feel free to edit our template as much as you like.
+### Useful resources
 
-Once you've added your information to the template, delete this file and rename the `README-template.md` file to `README.md`. That will make it show up as your repository's README file.
+- [MDN Web Docs - CSS custom properties](https://developer.mozilla.org/en-US/docs/Web/CSS/--*) - the clearest explanation of the cascade behaviour that makes theming work
+- [MDN Web Docs - grid-template-areas](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas) - how named grid areas resolve, which finally made the responsive card layout click for me
+- [MDN Web Docs - Event delegation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events) - the `closest()` pattern I used for the card list
+- [WAI-ARIA Authoring Practices - Switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/) - the keyboard and screen reader behaviour behind `role="switch"`
+- [WCAG Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/) - contrast and focus visibility checks
 
-## Submitting your solution
+### AI Collaboration
 
-Submit your solution on the platform for the rest of the community to see. Follow our ["Complete guide to submitting solutions"](https://www.frontendmentor.io/guides/how-to-submit-solutions) for tips on how to do this.
+I used an AI assistant (OpenCode) while building this project, mainly as a thinking partner rather than a code generator.
 
-Remember, if you're looking for feedback on your solution, be sure to ask questions when submitting it. The more specific and detailed you are with your questions, the higher the chance you'll get valuable feedback from the community.
+- **Where it helped:** working through the semantic HTML structure, reasoning about how to make the theme switch cleanly, debugging a Remove button whose only text lived inside a visually-hidden span, and pointing out that the design implied a responsive `grid-template-areas` change I had missed on the first pass
+- **What worked well:** being pushed to justify each decision before implementing it. Explaining *why* `role="switch"` beats a styled checkbox, or why the dark theme should re-point variables rather than override component styles, is what made those choices stick
+- **What didn't:** the AI's first pass had several styling decisions (navy focus rings, a bordered card hover, a different grid gap) that didn't match the design files. Those were only caught by going back and measuring the design JPGs directly. The design was the source of truth, not the first generated pass
+- **My own role:** reviewing every suggestion, measuring the actual designs, and writing all the final code
 
-## Sharing your solution
+## Author
 
-There are multiple places you can share your solution:
+- Frontend Mentor - [@lenzygold5-ops](https://www.frontendmentor.io/profile/lenzygold5-ops)
+- GitHub - [@lenzygold5-ops](https://github.com/lenzygold5-ops)
 
-1. Share your solution page in the **#finished-projects** channel of our [community](https://www.frontendmentor.io/community). 
-2. Share on [X (formerly Twitter)](https://x.com/frontendmentor) and mention **@frontendmentor**, including the repo and live URLs in your post. We'd love to take a look at what you've built and help share it around.
-3. Share your solution on [LinkedIn](https://www.linkedin.com/company/frontend-mentor/).
-4. Blog about your experience building your project. Writing about your workflow, technical choices, and talking through your code is a brilliant way to reinforce what you've learned. Great platforms to write on are [dev.to](https://dev.to/), [Hashnode](https://hashnode.com/), and [CodeNewbie](https://community.codenewbie.org/).
+## Acknowledgments
 
-We provide templates to help you share your solution once you've submitted it on the platform. Please do edit them and include specific questions when you're looking for feedback. 
-
-The more specific you are with your questions the more likely it is that another member of the community will give you feedback.
-
-## Got feedback for us?
-
-We love receiving feedback! We're always looking to improve our challenges and our platform. So if you have anything you'd like to mention, please email hi[at]frontendmentor[dot]io.
-
-This challenge is completely free. Please share it with anyone who will find it useful for practice.
-
-**Have fun building!** 🚀
+Challenge design and assets by [Frontend Mentor](https://www.frontendmentor.io). Icons and the Noto Sans font are provided under the SIL Open Font License.
